@@ -1,6 +1,6 @@
 <?php
 
-$meat_api = 'http://meatinapark.appspot.com/bbqfinder';
+$meat_api = 'http://meatinapark.appspot.com/multiplebbqfinder';
 
 # subiaco
 #$lat = -31.946409;
@@ -10,10 +10,13 @@ $meat_api = 'http://meatinapark.appspot.com/bbqfinder';
 $lat = floatval($_GET['lat']);
 $lon = floatval($_GET['lon']);
 $dis = floatval($_GET['radius'] / 1000);
+$cnt = array_key_exists('count', $_GET) ? floatval($_GET['count']) : 10;
 
-$content = file_get_contents("$meat_api?lat=$lat&long=$lon&distance=$dis");
+$url = "$meat_api?lat=$lat&long=$lon&distance=$dis&bbqCount=$cnt";
 
-$bbq = json_decode($content);
+$content = file_get_contents($url);
+
+$bbqs = json_decode($content);
 
 /*
  * Sample BBQ object:
@@ -35,26 +38,27 @@ $bbq = json_decode($content);
  *  }
  */
 
-if ($bbq->matchFound == 'true') {
-    $poi = array(array( 
-        'actions' => array(),
-        'distance' => 1000 * floatVal($bbq->distanceToBbq),
-        'id' => $bbq->bbqId,
-        'lat' => 1000000 * floatVal($bbq->latitude),
-        'lon' => 1000000 * floatVal($bbq->longitude),
-        'title' => $bbq->name,
-        'type' => 0
-    ));
-}
-else {
-    $poi = array();
+$pois = array();
+if ($bbqs->matchCount > 0) {
+    foreach ($bbqs->bbqList as $bbq) {
+        $pois[] = array( 
+            'actions' => array(),
+            'distance' => 1000 * floatVal($bbq->distanceToBbq),
+            'id' => $bbq->bbqId,
+            'lat' => 1000000 * floatVal($bbq->latitude),
+            'lon' => 1000000 * floatVal($bbq->longitude),
+            'line2' => "Type: ".$bbq->type,
+            'title' => $bbq->name,
+            'type' => 0
+        );
+    }
 }
 
 $output = array( 
     'layer' => 'meatinapark',
     'errorCode' => 0,
     'errorString' => 'ok',
-    'hotspots' => $poi
+    'hotspots' => $pois,
 );
 
 header('Content-type: application/json');
