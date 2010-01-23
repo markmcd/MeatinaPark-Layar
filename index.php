@@ -18,6 +18,8 @@ $content = file_get_contents($url);
 
 $bbqs = json_decode($content);
 
+# next up, toilets!
+
 /*
  * Sample BBQ object:
  *  object(stdClass)#1 (7) {
@@ -45,6 +47,7 @@ if ($bbqs->matchCount > 0) {
             'actions' => array(),
             'distance' => 1000 * floatVal($bbq->distanceToBbq),
             'id' => $bbq->bbqId,
+            'imageURL' => 'http://google-maps-icons.googlecode.com/files/restaurant.png',
             'lat' => 1000000 * floatVal($bbq->latitude),
             'lon' => 1000000 * floatVal($bbq->longitude),
             'line2' => "Type: ".$bbq->type,
