@@ -1,5 +1,10 @@
 <?php
 
+$log = fopen('/home/thedji/mylogs/miap.log', 'a');
+fwrite($log, print_r($_SERVER, true));
+fwrite($log, "=====\n\n");
+fclose($log);
+
 $meat_api = 'http://meatinapark.appspot.com/multiplebbqfinder';
 
 # subiaco
